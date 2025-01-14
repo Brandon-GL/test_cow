@@ -12,12 +12,13 @@ on:
     push:
         branches:
             - main
-            - dev
+
 env:
   ENVIRONMENT: Prod
   REGISTRY: docker.io
 
 jobs:
+    # On met en place l'OS sur lequel on va tourner et on prépare les matrix pour faire fonctionner tous les OS
     build:
         runs-on: ubuntu-24.04
         strategy:
@@ -26,15 +27,18 @@ jobs:
                 go-os: [ 'linux', 'darwin', 'windows' ]
 
         steps:
+        # Récuperer le code du repo
         - name: Get Code from repo
           uses: actions/checkout@v4
 
+        # Charger GO avec la version désigné
         - name: Setup Go
           uses: actions/setup-go@v5
           with:
             go-version: '1.23'
 
+        # On initialise le projet, on récupère les dépendance et on build à partir de Meuh.go les executable avec les matrix pour fonctionner dans n'importe qu'elle OS
         - run: |
             go init Cowsay/Meuh.go
             go tidy 
-            OS=${{ matrix.go-os }} ARCH=${{ matrix.go-arch }} go build -o "
+            OS=${{ matrix.go-os }} ARCH=${{ matrix.go-arch }} go build -o "Meuh_${{ matrix.go-os }}_${{ matrix.go-arch }}" Cowsay/Meuh.go
